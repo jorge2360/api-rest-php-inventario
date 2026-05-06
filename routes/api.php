@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../controllers/categoriaController.php';
+
 $database = new Database();
 $connection = $database->connect();
 
@@ -11,6 +13,11 @@ if ($uri === '/' && $method === 'GET') {
         'success' => true,
         'message' => 'API de inventario funcionando correctamente.'
     ]);
+}
+
+if ($uri === '/categorias' && $method === 'GET') {
+    $controller = new CategoriaController($connection);
+    $controller->index();
 }
 
 jsonResponse(404, [
