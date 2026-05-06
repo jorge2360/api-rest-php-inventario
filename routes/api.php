@@ -20,6 +20,11 @@ if ($uri === '/categorias' && $method === 'GET') {
     $controller->index();
 }
 
+if ($uri === '/categorias' && $method === 'POST') {
+    $controller = new CategoriaController($connection);
+    $controller->store();
+}
+
 jsonResponse(404, [
     'success' => false,
     'message' => 'Ruta no encontrada.'

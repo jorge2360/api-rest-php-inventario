@@ -28,4 +28,46 @@ class CategoriaController
             ]);
         }
     }
+    public function store(): void
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input) {
+                jsonResponse(400, [
+                    'success' => false,
+                    'message' => 'No se recibieron datos válidos.'
+                ]);
+            }
+
+            $nombre = trim($input['nombre'] ?? '');
+            $descripcion = trim($input['descripcion'] ?? '');
+
+            if ($nombre === '') {
+                jsonResponse(422, [
+                    'success' => false,
+                    'message' => 'El campo nombre es obligatorio.'
+                ]);
+            }
+
+            $sql = "INSERT INTO categoria (nombre, descripcion)
+                    VALUES (:nombre, :descripcion)";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([
+                ':nombre' => $nombre,
+                ':descripcion' => $descripcion
+            ]);
+
+            jsonResponse(201, [
+                'success' => true,
+                'message' => 'Categoría creada correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al crear la categoría.'
+            ]);
+        }
+    }
 }
