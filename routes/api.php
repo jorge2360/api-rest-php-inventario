@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../controllers/categoriaController.php';
+require_once __DIR__ . '/../controllers/productoController.php';
 
 $database = new Database();
 $connection = $database->connect();
@@ -37,6 +38,10 @@ if (preg_match('#^/categorias/(\d+)$#', $uri, $matches) && $method === 'PUT') {
 if (preg_match('#^/categorias/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
     $controller = new CategoriaController($connection);
     $controller->destroy((int) $matches[1]);
+}
+if ($uri === '/productos' && $method === 'GET') {
+    $controller = new ProductoController($connection);
+    $controller->index();
 }
 
 jsonResponse(404, [
