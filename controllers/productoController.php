@@ -219,4 +219,33 @@ class ProductoController
             ]);
         }
     }
+    public function destroy(int $id): void
+    {
+        try {
+            $checkSql = "SELECT id_producto FROM producto WHERE id_producto = :id LIMIT 1";
+            $checkStmt = $this->connection->prepare($checkSql);
+            $checkStmt->execute([':id' => $id]);
+
+            if (!$checkStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Producto no encontrado.'
+                ]);
+            }
+
+            $sql = "DELETE FROM producto WHERE id_producto = :id";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([':id' => $id]);
+
+            jsonResponse(200, [
+                'success' => true,
+                'message' => 'Producto eliminado correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al eliminar el producto.'
+            ]);
+        }
+    }
 }
