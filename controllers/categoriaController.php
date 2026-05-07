@@ -153,4 +153,33 @@ class CategoriaController
             ]);
         }
     }
+    public function destroy(int $id): void
+    {
+        try {
+            $checkSql = "SELECT id_categoria FROM categoria WHERE id_categoria = :id LIMIT 1";
+            $checkStmt = $this->connection->prepare($checkSql);
+            $checkStmt->execute([':id' => $id]);
+
+            if (!$checkStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Categoría no encontrada.'
+                ]);
+            }
+
+            $sql = "DELETE FROM categoria WHERE id_categoria = :id";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([':id' => $id]);
+
+            jsonResponse(200, [
+                'success' => true,
+                'message' => 'Categoría eliminada correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'No se puede eliminar la categoría porque tiene productos asociados.'
+            ]);
+        }
+    }
 }

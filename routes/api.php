@@ -34,6 +34,10 @@ if (preg_match('#^/categorias/(\d+)$#', $uri, $matches) && $method === 'PUT') {
     $controller = new CategoriaController($connection);
     $controller->update((int) $matches[1]);
 }
+if (preg_match('#^/categorias/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
+    $controller = new CategoriaController($connection);
+    $controller->destroy((int) $matches[1]);
+}
 
 jsonResponse(404, [
     'success' => false,
