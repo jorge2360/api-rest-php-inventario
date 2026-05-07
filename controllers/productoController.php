@@ -143,4 +143,80 @@ class ProductoController
             ]);
         }
     }
+    public function update(int $id): void
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input) {
+                jsonResponse(400, [
+                    'success' => false,
+                    'message' => 'No se recibieron datos válidos.'
+                ]);
+            }
+
+            $idCategoria = (int) ($input['id_categoria'] ?? 0);
+            $nombre = trim($input['nombre'] ?? '');
+            $descripcion = trim($input['descripcion'] ?? '');
+            $precio = (float) ($input['precio'] ?? 0);
+            $stock = (int) ($input['stock'] ?? 0);
+
+            if ($idCategoria <= 0 || $nombre === '' || $precio <= 0 || $stock < 0) {
+                jsonResponse(422, [
+                    'success' => false,
+                    'message' => 'Los campos id_categoria, nombre, precio y stock son obligatorios.'
+                ]);
+            }
+
+            $productoSql = "SELECT id_producto FROM producto WHERE id_producto = :id LIMIT 1";
+            $productoStmt = $this->connection->prepare($productoSql);
+            $productoStmt->execute([':id' => $id]);
+
+            if (!$productoStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Producto no encontrado.'
+                ]);
+            }
+
+            $categoriaSql = "SELECT id_categoria FROM categoria WHERE id_categoria = :id LIMIT 1";
+            $categoriaStmt = $this->connection->prepare($categoriaSql);
+            $categoriaStmt->execute([':id' => $idCategoria]);
+
+            if (!$categoriaStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Categoría no encontrada.'
+                ]);
+            }
+
+            $sql = "UPDATE producto
+                    SET id_categoria = :id_categoria,
+                        nombre = :nombre,
+                        descripcion = :descripcion,
+                        precio = :precio,
+                        stock = :stock
+                    WHERE id_producto = :id";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([
+                ':id_categoria' => $idCategoria,
+                ':nombre' => $nombre,
+                ':descripcion' => $descripcion,
+                ':precio' => $precio,
+                ':stock' => $stock,
+                ':id' => $id
+            ]);
+
+            jsonResponse(200, [
+                'success' => true,
+                'message' => 'Producto actualizado correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al actualizar el producto.'
+            ]);
+        }
+    }
 }
