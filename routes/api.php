@@ -43,6 +43,10 @@ if ($uri === '/productos' && $method === 'GET') {
     $controller = new ProductoController($connection);
     $controller->index();
 }
+if ($uri === '/productos' && $method === 'POST') {
+    $controller = new ProductoController($connection);
+    $controller->store();
+}
 
 jsonResponse(404, [
     'success' => false,

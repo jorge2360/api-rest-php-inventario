@@ -42,4 +42,63 @@ class ProductoController
             ]);
         }
     }
+    public function store(): void
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input) {
+                jsonResponse(400, [
+                    'success' => false,
+                    'message' => 'No se recibieron datos válidos.'
+                ]);
+            }
+
+            $idCategoria = (int) ($input['id_categoria'] ?? 0);
+            $nombre = trim($input['nombre'] ?? '');
+            $descripcion = trim($input['descripcion'] ?? '');
+            $precio = (float) ($input['precio'] ?? 0);
+            $stock = (int) ($input['stock'] ?? 0);
+
+            if ($idCategoria <= 0 || $nombre === '' || $precio <= 0 || $stock < 0) {
+                jsonResponse(422, [
+                    'success' => false,
+                    'message' => 'Los campos id_categoria, nombre, precio y stock son obligatorios.'
+                ]);
+            }
+
+            $checkSql = "SELECT id_categoria FROM categoria WHERE id_categoria = :id LIMIT 1";
+            $checkStmt = $this->connection->prepare($checkSql);
+            $checkStmt->execute([':id' => $idCategoria]);
+
+            if (!$checkStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Categoría no encontrada.'
+                ]);
+            }
+
+            $sql = "INSERT INTO producto (id_categoria, nombre, descripcion, precio, stock)
+                    VALUES (:id_categoria, :nombre, :descripcion, :precio, :stock)";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([
+                ':id_categoria' => $idCategoria,
+                ':nombre' => $nombre,
+                ':descripcion' => $descripcion,
+                ':precio' => $precio,
+                ':stock' => $stock
+            ]);
+
+            jsonResponse(201, [
+                'success' => true,
+                'message' => 'Producto creado correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al crear el producto.'
+            ]);
+        }
+    }
 }
