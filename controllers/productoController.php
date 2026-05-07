@@ -101,4 +101,46 @@ class ProductoController
             ]);
         }
     }
+    public function show(int $id): void
+    {
+        try {
+            $sql = "SELECT 
+                        p.id_producto,
+                        p.nombre,
+                        p.descripcion,
+                        p.precio,
+                        p.stock,
+                        p.created_at,
+                        p.updated_at,
+                        c.id_categoria,
+                        c.nombre AS categoria
+                    FROM producto p
+                    INNER JOIN categoria c 
+                        ON p.id_categoria = c.id_categoria
+                    WHERE p.id_producto = :id
+                    LIMIT 1";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([':id' => $id]);
+
+            $producto = $stmt->fetch();
+
+            if (!$producto) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Producto no encontrado.'
+                ]);
+            }
+
+            jsonResponse(200, [
+                'success' => true,
+                'data' => $producto
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al obtener el producto.'
+            ]);
+        }
+    }
 }

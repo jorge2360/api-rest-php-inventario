@@ -47,6 +47,10 @@ if ($uri === '/productos' && $method === 'POST') {
     $controller = new ProductoController($connection);
     $controller->store();
 }
+if (preg_match('#^/productos/(\d+)$#', $uri, $matches) && $method === 'GET') {
+    $controller = new ProductoController($connection);
+    $controller->show((int) $matches[1]);
+}
 
 jsonResponse(404, [
     'success' => false,
