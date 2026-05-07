@@ -70,4 +70,31 @@ class CategoriaController
             ]);
         }
     }
+    public function show(int $id): void
+    {
+        try {
+            $sql = "SELECT * FROM categoria WHERE id_categoria = :id LIMIT 1";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([':id' => $id]);
+
+            $categoria = $stmt->fetch();
+
+            if (!$categoria) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Categoría no encontrada.'
+                ]);
+            }
+
+            jsonResponse(200, [
+                'success' => true,
+                'data' => $categoria
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al obtener la categoría.'
+            ]);
+        }
+    }
 }

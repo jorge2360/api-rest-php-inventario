@@ -25,6 +25,11 @@ if ($uri === '/categorias' && $method === 'POST') {
     $controller->store();
 }
 
+if (preg_match('#^/categorias/(\d+)$#', $uri, $matches) && $method === 'GET') {
+    $controller = new CategoriaController($connection);
+    $controller->show((int) $matches[1]);
+}
+
 jsonResponse(404, [
     'success' => false,
     'message' => 'Ruta no encontrada.'
