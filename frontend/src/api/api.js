@@ -33,4 +33,15 @@ export const categoriaApi = {
       body: JSON.stringify(payload),
     })
   },
+  update(id, payload) {
+    return request(`/categorias/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  },
+  delete(id) {
+    return request(`/categorias/${id}`, {
+      method: 'DELETE',
+    })
+  },
 }
