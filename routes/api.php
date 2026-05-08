@@ -59,6 +59,10 @@ if (preg_match('#^/productos/(\d+)$#', $uri, $matches) && $method === 'DELETE') 
     $controller = new ProductoController($connection);
     $controller->destroy((int) $matches[1]);
 }
+if (preg_match('#^/productos/(\d+)/stock$#', $uri, $matches) && $method === 'PATCH') {
+    $controller = new ProductoController($connection);
+    $controller->updateStock((int) $matches[1]);
+}
 
 jsonResponse(404, [
     'success' => false,

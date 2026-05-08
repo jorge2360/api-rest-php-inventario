@@ -248,4 +248,57 @@ class ProductoController
             ]);
         }
     }
+    public function updateStock(int $id): void
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input) {
+                jsonResponse(400, [
+                    'success' => false,
+                    'message' => 'No se recibieron datos válidos.'
+                ]);
+            }
+
+            $stock = (int) ($input['stock'] ?? -1);
+
+            if ($stock < 0) {
+                jsonResponse(422, [
+                    'success' => false,
+                    'message' => 'El stock debe ser mayor o igual a cero.'
+                ]);
+            }
+
+            $checkSql = "SELECT id_producto FROM producto WHERE id_producto = :id LIMIT 1";
+            $checkStmt = $this->connection->prepare($checkSql);
+            $checkStmt->execute([':id' => $id]);
+
+            if (!$checkStmt->fetch()) {
+                jsonResponse(404, [
+                    'success' => false,
+                    'message' => 'Producto no encontrado.'
+                ]);
+            }
+
+            $sql = "UPDATE producto
+                    SET stock = :stock
+                    WHERE id_producto = :id";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([
+                ':stock' => $stock,
+                ':id' => $id
+            ]);
+
+            jsonResponse(200, [
+                'success' => true,
+                'message' => 'Stock actualizado correctamente.'
+            ]);
+        } catch (PDOException $e) {
+            jsonResponse(500, [
+                'success' => false,
+                'message' => 'Error al actualizar el stock.'
+            ]);
+        }
+    }
 }
