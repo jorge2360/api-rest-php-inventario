@@ -45,3 +45,8 @@ export const categoriaApi = {
     })
   },
 }
+export const productoApi = {
+  getAll() {
+    return request('/productos')
+  },
+}
