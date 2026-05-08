@@ -55,4 +55,15 @@ export const productoApi = {
       body: JSON.stringify(payload),
     })
   },
+  update(id, payload) {
+    return request(`/productos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  },
+  delete(id) {
+    return request(`/productos/${id}`, {
+      method: 'DELETE',
+    })
+  },
 }

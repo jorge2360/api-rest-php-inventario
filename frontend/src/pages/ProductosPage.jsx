@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { categoriaApi, productoApi } from '../api/api'
 
 function ProductosPage() {
+  const [editingId, setEditingId] = useState(null)
   const [productos, setProductos] = useState([])
   const [categorias, setCategorias] = useState([])
   const [form, setForm] = useState({
@@ -44,38 +45,81 @@ function ProductosPage() {
       precio: '',
       stock: '',
     })
+    setEditingId(null)
   }
 
   const guardarProducto = async (event) => {
-    event.preventDefault()
-    setError('')
-    setSuccessMessage('')
+  event.preventDefault()
+  setError('')
+  setSuccessMessage('')
 
-    if (!form.id_categoria || !form.nombre.trim() || Number(form.precio) <= 0 || Number(form.stock) < 0) {
-      setError('Los campos categoría, nombre, precio y stock son obligatorios.')
-      return
-    }
-
-    try {
-      setSaving(true)
-
-      await productoApi.create({
-        id_categoria: Number(form.id_categoria),
-        nombre: form.nombre,
-        descripcion: form.descripcion,
-        precio: Number(form.precio),
-        stock: Number(form.stock),
-      })
-
-      setSuccessMessage('Producto creado correctamente.')
-      resetForm()
-      await cargarDatos()
-    } catch (err) {
-      setError(err.message || 'Error al crear producto')
-    } finally {
-      setSaving(false)
-    }
+  if (!form.id_categoria || !form.nombre.trim() || Number(form.precio) <= 0 || Number(form.stock) < 0) {
+    setError('Los campos categoría, nombre, precio y stock son obligatorios.')
+    return
   }
+
+  try {
+    setSaving(true)
+
+    const payload = {
+      id_categoria: Number(form.id_categoria),
+      nombre: form.nombre,
+      descripcion: form.descripcion,
+      precio: Number(form.precio),
+      stock: Number(form.stock),
+    }
+
+    if (editingId) {
+      await productoApi.update(editingId, payload)
+      setSuccessMessage('Producto actualizado correctamente.')
+    } else {
+      await productoApi.create(payload)
+      setSuccessMessage('Producto creado correctamente.')
+    }
+
+    resetForm()
+    await cargarDatos()
+  } catch (err) {
+    setError(err.message || 'Error al guardar producto')
+  } finally {
+    setSaving(false)
+  }
+}
+
+const editarProducto = (producto) => {
+  setError('')
+  setSuccessMessage('')
+  setEditingId(producto.id_producto)
+
+  setForm({
+    id_categoria: producto.id_categoria || '',
+    nombre: producto.nombre || '',
+    descripcion: producto.descripcion || '',
+    precio: producto.precio || '',
+    stock: producto.stock || '',
+  })
+}
+
+const eliminarProducto = async (id) => {
+  setError('')
+  setSuccessMessage('')
+
+  const confirmado = window.confirm('¿Deseas eliminar este producto?')
+  if (!confirmado) return
+
+  try {
+    await productoApi.delete(id)
+    setSuccessMessage('Producto eliminado correctamente.')
+
+    if (editingId === id) {
+      resetForm()
+    }
+
+    await cargarDatos()
+  } catch (err) {
+    setError(err.message || 'Error al eliminar producto')
+  }
+}
 
   useEffect(() => {
     cargarDatos()
@@ -91,14 +135,10 @@ function ProductosPage() {
           <select
             value={form.id_categoria}
             onChange={(e) => setForm({ ...form, id_categoria: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          >
+            className="w-full rounded border border-slate-300 px-3 py-2">
             <option value="">Seleccione una categoría</option>
             {categorias.map((categoria) => (
-              <option key={categoria.id_categoria} value={categoria.id_categoria}>
-                {categoria.nombre}
-              </option>
-            ))}
+              <option key={categoria.id_categoria} value={categoria.id_categoria}>{categoria.nombre}</option>))}
           </select>
         </div>
 
@@ -108,8 +148,7 @@ function ProductosPage() {
             type="text"
             value={form.nombre}
             onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div>
@@ -120,8 +159,7 @@ function ProductosPage() {
             min="0.01"
             value={form.precio}
             onChange={(e) => setForm({ ...form, precio: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div>
@@ -131,8 +169,7 @@ function ProductosPage() {
             min="0"
             value={form.stock}
             onChange={(e) => setForm({ ...form, stock: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div className="md:col-span-2">
@@ -141,18 +178,25 @@ function ProductosPage() {
             type="text"
             value={form.descripcion}
             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div className="md:col-span-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70"
-          >
-            {saving ? 'Guardando...' : 'Guardar producto'}
-          </button>
+          <div className="md:col-span-2 flex gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70">
+              {saving ? 'Guardando...' : editingId ? 'Actualizar producto' : 'Guardar producto'}
+            </button>
+
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded bg-slate-500 px-4 py-2 text-white hover:bg-slate-600">Cancelar edición</button>
+            )}
+          </div>
         </div>
       </form>
 
@@ -177,6 +221,7 @@ function ProductosPage() {
                   <th className="border p-3 text-left">Precio</th>
                   <th className="border p-3 text-left">Stock</th>
                   <th className="border p-3 text-left">Descripción</th>
+                  <th className="border p-3 text-left">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -188,6 +233,19 @@ function ProductosPage() {
                     <td className="border p-3">Q {Number(producto.precio).toFixed(2)}</td>
                     <td className="border p-3">{producto.stock}</td>
                     <td className="border p-3">{producto.descripcion}</td>
+                    <td className="border p-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => editarProducto(producto)}
+                          className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600">Editar</button>
+
+                        <button
+                          type="button"
+                          onClick={() => eliminarProducto(producto.id_producto)}
+                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">Eliminar</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

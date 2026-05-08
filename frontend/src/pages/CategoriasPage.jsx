@@ -105,8 +105,7 @@ function CategoriasPage() {
             type="text"
             value={form.nombre}
             onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div>
@@ -115,16 +114,14 @@ function CategoriasPage() {
             type="text"
             value={form.descripcion}
             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"
-          />
+            className="w-full rounded border border-slate-300 px-3 py-2"/>
         </div>
 
         <div className="flex gap-2 md:col-span-2">
           <button
             type="submit"
             disabled={saving}
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70"
-          >
+            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70">
             {saving ? 'Guardando...' : editingId ? 'Actualizar categoría' : 'Guardar categoría'}
           </button>
 
@@ -132,11 +129,7 @@ function CategoriasPage() {
             <button
               type="button"
               onClick={resetForm}
-              className="rounded bg-slate-500 px-4 py-2 text-white hover:bg-slate-600"
-            >
-              Cancelar edición
-            </button>
-          )}
+              className="rounded bg-slate-500 px-4 py-2 text-white hover:bg-slate-600">Cancelar edición</button>)}
         </div>
       </form>
 
@@ -172,18 +165,12 @@ function CategoriasPage() {
                         <button
                           type="button"
                           onClick={() => editarCategoria(categoria)}
-                          className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600"
-                        >
-                          Editar
-                        </button>
+                          className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600">Editar</button>
 
                         <button
                           type="button"
                           onClick={() => eliminarCategoria(categoria.id_categoria)}
-                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
-                        >
-                          Eliminar
-                        </button>
+                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">Eliminar</button>
                       </div>
                     </td>
                   </tr>
