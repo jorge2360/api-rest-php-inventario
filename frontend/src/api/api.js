@@ -49,4 +49,10 @@ export const productoApi = {
   getAll() {
     return request('/productos')
   },
+  create(payload) {
+    return request('/productos', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
 }

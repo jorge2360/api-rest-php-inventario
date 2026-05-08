@@ -1,39 +1,173 @@
 import { useEffect, useState } from 'react'
-import { productoApi } from '../api/api'
+import { categoriaApi, productoApi } from '../api/api'
 
 function ProductosPage() {
   const [productos, setProductos] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [categorias, setCategorias] = useState([])
+  const [form, setForm] = useState({
+    id_categoria: '',
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+  })
 
-  const cargarProductos = async () => {
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+  const cargarDatos = async () => {
     setLoading(true)
     setError('')
 
     try {
-      const response = await productoApi.getAll()
-      setProductos(Array.isArray(response.data) ? response.data : [])
+      const [productosResponse, categoriasResponse] = await Promise.all([
+        productoApi.getAll(),
+        categoriaApi.getAll(),
+      ])
+
+      setProductos(Array.isArray(productosResponse.data) ? productosResponse.data : [])
+      setCategorias(Array.isArray(categoriasResponse.data) ? categoriasResponse.data : [])
     } catch (err) {
-      setError(err.message || 'Error al cargar productos')
+      setError(err.message || 'Error al cargar datos')
     } finally {
       setLoading(false)
     }
   }
 
+  const resetForm = () => {
+    setForm({
+      id_categoria: '',
+      nombre: '',
+      descripcion: '',
+      precio: '',
+      stock: '',
+    })
+  }
+
+  const guardarProducto = async (event) => {
+    event.preventDefault()
+    setError('')
+    setSuccessMessage('')
+
+    if (!form.id_categoria || !form.nombre.trim() || Number(form.precio) <= 0 || Number(form.stock) < 0) {
+      setError('Los campos categoría, nombre, precio y stock son obligatorios.')
+      return
+    }
+
+    try {
+      setSaving(true)
+
+      await productoApi.create({
+        id_categoria: Number(form.id_categoria),
+        nombre: form.nombre,
+        descripcion: form.descripcion,
+        precio: Number(form.precio),
+        stock: Number(form.stock),
+      })
+
+      setSuccessMessage('Producto creado correctamente.')
+      resetForm()
+      await cargarDatos()
+    } catch (err) {
+      setError(err.message || 'Error al crear producto')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   useEffect(() => {
-    cargarProductos()
+    cargarDatos()
   }, [])
 
   return (
     <section className="rounded-lg bg-white p-6 shadow">
       <h2 className="text-xl font-semibold text-slate-800">Productos</h2>
 
-      {loading && <p className="mt-4 text-slate-600">Cargando productos...</p>}
-      {error && <p className="mt-4 rounded bg-red-100 p-3 text-red-700">{error}</p>}
+      <form onSubmit={guardarProducto} className="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Categoría</label>
+          <select
+            value={form.id_categoria}
+            onChange={(e) => setForm({ ...form, id_categoria: e.target.value })}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          >
+            <option value="">Seleccione una categoría</option>
+            {categorias.map((categoria) => (
+              <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                {categoria.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {!loading && !error && (
-        <div className="mt-4 overflow-x-auto">
-          {productos.length > 0 ? (
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Nombre</label>
+          <input
+            type="text"
+            value={form.nombre}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Precio</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0.01"
+            value={form.precio}
+            onChange={(e) => setForm({ ...form, precio: e.target.value })}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Stock</label>
+          <input
+            type="number"
+            min="0"
+            value={form.stock}
+            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="mb-1 block text-sm font-medium text-slate-700">Descripción</label>
+          <input
+            type="text"
+            value={form.descripcion}
+            onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70"
+          >
+            {saving ? 'Guardando...' : 'Guardar producto'}
+          </button>
+        </div>
+      </form>
+
+      {error && <p className="mt-4 rounded bg-red-100 p-3 text-red-700">{error}</p>}
+      {successMessage && (
+        <p className="mt-4 rounded bg-green-100 p-3 text-green-700">{successMessage}</p>
+      )}
+
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold text-slate-800">Listado de productos</h3>
+
+        {loading ? (
+          <p className="mt-4 text-slate-600">Cargando productos...</p>
+        ) : productos.length > 0 ? (
+          <div className="mt-4 overflow-x-auto">
             <table className="w-full border-collapse bg-white">
               <thead>
                 <tr className="bg-slate-100">
@@ -58,11 +192,11 @@ function ProductosPage() {
                 ))}
               </tbody>
             </table>
-          ) : (
-            <p className="text-slate-600">No hay productos registrados.</p>
-          )}
-        </div>
-      )}
+          </div>
+        ) : (
+          <p className="mt-4 text-slate-600">No hay productos registrados.</p>
+        )}
+      </div>
     </section>
   )
 }
