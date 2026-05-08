@@ -1,0 +1,19 @@
+# Dependencias y configuraciones locales
+/vendor/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Configuración de VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Variables de entorno
+.env
+
+# Archivos temporales
+*.tmp
+*.temp
