@@ -27,4 +27,10 @@ export const categoriaApi = {
   getAll() {
     return request('/categorias')
   },
+  create(payload) {
+    return request('/categorias', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
 }
