@@ -120,6 +120,33 @@ const eliminarProducto = async (id) => {
     setError(err.message || 'Error al eliminar producto')
   }
 }
+const actualizarStock = async (producto) => {
+  setError('')
+  setSuccessMessage('')
+
+  const nuevoStock = window.prompt(
+    `Ingrese el nuevo stock para ${producto.nombre}:`,
+    producto.stock,
+  )
+
+  if (nuevoStock === null) return
+
+  if (Number(nuevoStock) < 0 || nuevoStock.trim() === '') {
+    setError('El stock debe ser mayor o igual a cero.')
+    return
+  }
+
+  try {
+    await productoApi.updateStock(producto.id_producto, {
+      stock: Number(nuevoStock),
+    })
+
+    setSuccessMessage('Stock actualizado correctamente.')
+    await cargarDatos()
+  } catch (err) {
+    setError(err.message || 'Error al actualizar stock')
+  }
+}
 
   useEffect(() => {
     cargarDatos()
@@ -239,12 +266,16 @@ const eliminarProducto = async (id) => {
                           type="button"
                           onClick={() => editarProducto(producto)}
                           className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600">Editar</button>
-
                         <button
                           type="button"
                           onClick={() => eliminarProducto(producto.id_producto)}
                           className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">Eliminar</button>
+                        <button
+                        type="button"
+                        onClick={() => actualizarStock(producto)}
+                        className="rounded bg-emerald-600 px-3 py-1 text-white hover:bg-emerald-700">Stock</button>
                       </div>
+                      
                     </td>
                   </tr>
                 ))}

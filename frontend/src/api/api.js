@@ -66,4 +66,10 @@ export const productoApi = {
       method: 'DELETE',
     })
   },
+  updateStock(id, payload) {
+  return request(`/productos/${id}/stock`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+},
 }
