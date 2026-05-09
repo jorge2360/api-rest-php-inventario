@@ -97,3 +97,38 @@ GET	       /productos/{id}	        Obtiene un producto por ID
 PUT	       /productos/{id}	        Actualiza un producto
 DELETE	   /productos/{id}	        Elimina un producto
 PATCH	   /productos/{id}/stock	Actualiza únicamente el stock de un producto
+
+## Frontend
+
+El proyecto incluye un frontend desarrollado con React y Tailwind CSS para consumir la API REST.
+
+### Tecnologías del frontend
+
+- React
+- Vite
+- Tailwind CSS
+- JavaScript
+
+### Ejecutar frontend
+
+Ingresar a la carpeta 'frontend':
+
+cd frontend
+
+Instalar dependencias:
+
+npm install
+
+Ejecutar servidor de desarrollo:
+
+npm run dev
+
+Abrir en navegador: http://localhost:5173
+
+## Funcionalidades del frontend
+
+- Listado de categorías
+-Creación, edición y eliminación de categorías
+- Listado de productos
+- Creación, edición y eliminación de productos
+- Actualización rápida de stock
