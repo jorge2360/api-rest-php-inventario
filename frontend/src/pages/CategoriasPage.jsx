@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { categoriaApi } from '../api/api'
+import Card from '../components/Card'
+import Button from '../components/Button'
+import Alert from '../components/Alert'
 
 function CategoriasPage() {
   const [categorias, setCategorias] = useState([])
@@ -95,17 +98,16 @@ function CategoriasPage() {
   }, [])
 
   return (
-    <section className="rounded-lg bg-white p-6 shadow">
-      <h2 className="text-xl font-semibold text-slate-800">Categorías</h2>
-
-      <form onSubmit={guardarCategoria} className="mt-4 grid gap-4 md:grid-cols-2">
+    <Card title="Gestión de categorías">
+      <form onSubmit={guardarCategoria} className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">Nombre</label>
           <input
             type="text"
             value={form.nombre}
             onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"/>
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
         </div>
 
         <div>
@@ -114,63 +116,83 @@ function CategoriasPage() {
             type="text"
             value={form.descripcion}
             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            className="w-full rounded border border-slate-300 px-3 py-2"/>
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
         </div>
 
-        <div className="flex gap-2 md:col-span-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-70">
+        <div className="flex flex-wrap gap-2 md:col-span-2">
+          <Button type="submit" disabled={saving}>
             {saving ? 'Guardando...' : editingId ? 'Actualizar categoría' : 'Guardar categoría'}
-          </button>
+          </Button>
 
           {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded bg-slate-500 px-4 py-2 text-white hover:bg-slate-600">Cancelar edición</button>)}
+            <Button type="button" variant="secondary" onClick={resetForm}>
+              Cancelar edición
+            </Button>
+          )}
         </div>
       </form>
 
-      {error && <p className="mt-4 rounded bg-red-100 p-3 text-red-700">{error}</p>}
-      {successMessage && (
-        <p className="mt-4 rounded bg-green-100 p-3 text-green-700">{successMessage}</p>
-      )}
+      <div className="mt-4 space-y-3">
+        {error && <Alert type="error">{error}</Alert>}
+        {successMessage && <Alert type="success">{successMessage}</Alert>}
+      </div>
 
       <div className="mt-6">
-        <h3 className="text-lg font-semibold text-slate-800">Listado de categorías</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-800">Listado de categorías</h3>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
+            Total: {categorias.length}
+          </span>
+        </div>
 
         {loading ? (
-          <p className="mt-4 text-slate-600">Cargando categorías...</p>
+          <p className="text-slate-600">Cargando categorías...</p>
         ) : categorias.length > 0 ? (
-          <div className="mt-4 overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full border-collapse bg-white">
               <thead>
-                <tr className="bg-slate-100">
-                  <th className="border p-3 text-left">ID</th>
-                  <th className="border p-3 text-left">Nombre</th>
-                  <th className="border p-3 text-left">Descripción</th>
-                  <th className="border p-3 text-left">Acciones</th>
+                <tr className="bg-slate-50">
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">
+                    ID
+                  </th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">
+                    Nombre
+                  </th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">
+                    Descripción
+                  </th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
+
               <tbody>
                 {categorias.map((categoria) => (
-                  <tr key={categoria.id_categoria}>
-                    <td className="border p-3">{categoria.id_categoria}</td>
-                    <td className="border p-3">{categoria.nombre}</td>
-                    <td className="border p-3">{categoria.descripcion}</td>
-                    <td className="border p-3">
+                  <tr key={categoria.id_categoria} className="hover:bg-slate-50">
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-700">
+                      {categoria.id_categoria}
+                    </td>
+                    <td className="border-b border-slate-100 p-3 text-sm font-medium text-slate-800">
+                      {categoria.nombre}
+                    </td>
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-600">
+                      {categoria.descripcion || 'Sin descripción'}
+                    </td>
+                    <td className="border-b border-slate-100 p-3">
                       <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => editarCategoria(categoria)}
-                          className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600">Editar</button>
+                        <Button type="button" variant="warning" onClick={() => editarCategoria(categoria)}>
+                          Editar
+                        </Button>
 
-                        <button
+                        <Button
                           type="button"
+                          variant="danger"
                           onClick={() => eliminarCategoria(categoria.id_categoria)}
-                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">Eliminar</button>
+                        >
+                          Eliminar
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -179,10 +201,10 @@ function CategoriasPage() {
             </table>
           </div>
         ) : (
-          <p className="mt-4 text-slate-600">No hay categorías registradas.</p>
+          <Alert type="info">No hay categorías registradas.</Alert>
         )}
       </div>
-    </section>
+    </Card>
   )
 }
 
