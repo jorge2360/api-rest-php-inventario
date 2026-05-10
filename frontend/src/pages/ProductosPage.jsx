@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { categoriaApi, productoApi } from '../api/api'
+import Card from '../components/Card'
+import Button from '../components/Button'
+import Alert from '../components/Alert'
 
 function ProductosPage() {
   const [editingId, setEditingId] = useState(null)
@@ -152,9 +155,22 @@ const actualizarStock = async (producto) => {
     cargarDatos()
   }, [])
 
+const getStockBadge = (stock) => {
+  const value = Number(stock)
+
+  if (value <= 5) {
+    return 'bg-red-100 text-red-700'
+  }
+
+  if (value <= 15) {
+    return 'bg-amber-100 text-amber-700'
+  }
+
+  return 'bg-emerald-100 text-emerald-700'
+}
+
   return (
-    <section className="rounded-lg bg-white p-6 shadow">
-      <h2 className="text-xl font-semibold text-slate-800">Productos</h2>
+    <Card title="Gestión de productos">
 
       <form onSubmit={guardarProducto} className="mt-4 grid gap-4 md:grid-cols-2">
         <div>
@@ -218,19 +234,16 @@ const actualizarStock = async (producto) => {
             </button>
 
             {editingId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="rounded bg-slate-500 px-4 py-2 text-white hover:bg-slate-600">Cancelar edición</button>
+              <Button type="button" variant="secondary" onClick={resetForm}>
+                Cancelar edición
+              </Button>
             )}
           </div>
         </div>
       </form>
 
-      {error && <p className="mt-4 rounded bg-red-100 p-3 text-red-700">{error}</p>}
-      {successMessage && (
-        <p className="mt-4 rounded bg-green-100 p-3 text-green-700">{successMessage}</p>
-      )}
+      {error && <Alert type="error">{error}</Alert>}
+      {successMessage && <Alert type="success">{successMessage}</Alert>}
 
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-slate-800">Listado de productos</h3>
@@ -238,44 +251,45 @@ const actualizarStock = async (producto) => {
         {loading ? (
           <p className="mt-4 text-slate-600">Cargando productos...</p>
         ) : productos.length > 0 ? (
-          <div className="mt-4 overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full border-collapse bg-white">
               <thead>
-                <tr className="bg-slate-100">
-                  <th className="border p-3 text-left">ID</th>
-                  <th className="border p-3 text-left">Producto</th>
-                  <th className="border p-3 text-left">Categoría</th>
-                  <th className="border p-3 text-left">Precio</th>
-                  <th className="border p-3 text-left">Stock</th>
-                  <th className="border p-3 text-left">Descripción</th>
-                  <th className="border p-3 text-left">Acciones</th>
+                <tr className="bg-slate-50">
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">ID</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Producto</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Categoría</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Precio</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Stock</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Descripción</th>
+                  <th className="border-b border-slate-200 p-3 text-left text-sm font-semibold text-slate-700">Acciones</th>
                 </tr>
               </thead>
+
               <tbody>
                 {productos.map((producto) => (
-                  <tr key={producto.id_producto}>
-                    <td className="border p-3">{producto.id_producto}</td>
-                    <td className="border p-3">{producto.nombre}</td>
-                    <td className="border p-3">{producto.categoria}</td>
-                    <td className="border p-3">Q {Number(producto.precio).toFixed(2)}</td>
-                    <td className="border p-3">{producto.stock}</td>
-                    <td className="border p-3">{producto.descripcion}</td>
-                    <td className="border p-3">
+                  <tr key={producto.id_producto} className="hover:bg-slate-50">
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-700">{producto.id_producto}</td>
+                    <td className="border-b border-slate-100 p-3 text-sm font-medium text-slate-800">{producto.nombre}</td>
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-600">{producto.categoria}</td>
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-700">Q {Number(producto.precio).toFixed(2)}</td>
+                    <td className="border-b border-slate-100 p-3">
+                      <span className={`rounded-full px-3 py-1 text-sm font-medium ${getStockBadge(producto.stock)}`}>
+                        {producto.stock}
+                      </span>
+                    </td>
+                    <td className="border-b border-slate-100 p-3 text-sm text-slate-600">{producto.descripcion || 'Sin descripción'}</td>
+                    <td className="border-b border-slate-100 p-3">
                       <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => editarProducto(producto)}
-                          className="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600">Editar</button>
-                        <button
-                          type="button"
-                          onClick={() => eliminarProducto(producto.id_producto)}
-                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">Eliminar</button>
-                        <button
-                        type="button"
-                        onClick={() => actualizarStock(producto)}
-                        className="rounded bg-emerald-600 px-3 py-1 text-white hover:bg-emerald-700">Stock</button>
+                        <Button type="button" variant="warning" onClick={() => editarProducto(producto)}>
+                          Editar
+                        </Button>
+                        <Button type="button" variant="success" onClick={() => actualizarStock(producto)}>
+                          Stock
+                        </Button>
+                        <Button type="button" variant="danger" onClick={() => eliminarProducto(producto.id_producto)}>
+                          Eliminar
+                        </Button>
                       </div>
-                      
                     </td>
                   </tr>
                 ))}
@@ -286,7 +300,7 @@ const actualizarStock = async (producto) => {
           <p className="mt-4 text-slate-600">No hay productos registrados.</p>
         )}
       </div>
-    </section>
+    </Card>
   )
 }
 
