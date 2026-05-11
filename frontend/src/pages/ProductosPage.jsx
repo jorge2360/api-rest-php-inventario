@@ -169,6 +169,18 @@ const getStockBadge = (stock) => {
   return 'bg-emerald-100 text-emerald-700'
 }
 
+const [searchTerm, setSearchTerm] = useState('')
+
+const productosFiltrados = productos.filter((producto) => {
+  const termino = searchTerm.toLowerCase()
+
+  return (
+    producto.nombre.toLowerCase().includes(termino) ||
+    producto.categoria.toLowerCase().includes(termino) ||
+    (producto.descripcion || '').toLowerCase().includes(termino)
+  )
+})
+
   return (
     <Card title="Gestión de productos">
 
@@ -248,9 +260,22 @@ const getStockBadge = (stock) => {
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-slate-800">Listado de productos</h3>
 
+        <div className="mb-4">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            Buscar producto
+          </label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por nombre, categoría o descripción"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+
         {loading ? (
           <p className="mt-4 text-slate-600">Cargando productos...</p>
-        ) : productos.length > 0 ? (
+        ) : productosFiltrados.length > 0 ? (
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full border-collapse bg-white">
               <thead>
@@ -266,7 +291,7 @@ const getStockBadge = (stock) => {
               </thead>
 
               <tbody>
-                {productos.map((producto) => (
+                {productosFiltrados.map((producto) => (
                   <tr key={producto.id_producto} className="hover:bg-slate-50">
                     <td className="border-b border-slate-100 p-3 text-sm text-slate-700">{producto.id_producto}</td>
                     <td className="border-b border-slate-100 p-3 text-sm font-medium text-slate-800">{producto.nombre}</td>

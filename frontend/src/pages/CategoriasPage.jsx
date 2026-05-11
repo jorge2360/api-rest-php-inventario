@@ -97,6 +97,17 @@ function CategoriasPage() {
     cargarCategorias()
   }, [])
 
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const categoriasFiltradas = categorias.filter((categoria) => {
+    const termino = searchTerm.toLowerCase()
+
+    return (
+      categoria.nombre.toLowerCase().includes(termino) ||
+      (categoria.descripcion || '').toLowerCase().includes(termino)
+    )
+  })
+
   return (
     <Card title="Gestión de categorías">
       <form onSubmit={guardarCategoria} className="grid gap-4 md:grid-cols-2">
@@ -142,13 +153,26 @@ function CategoriasPage() {
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-800">Listado de categorías</h3>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
-            Total: {categorias.length}
+            Mostrando: {categoriasFiltradas.length} de {categorias.length}
           </span>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            Buscar categoría
+          </label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por nombre o descripción"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
         </div>
 
         {loading ? (
           <p className="text-slate-600">Cargando categorías...</p>
-        ) : categorias.length > 0 ? (
+        ) : categoriasFiltradas.length > 0 ? (
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full border-collapse bg-white">
               <thead>
@@ -169,7 +193,7 @@ function CategoriasPage() {
               </thead>
 
               <tbody>
-                {categorias.map((categoria) => (
+                {categoriasFiltradas.map((categoria) => (
                   <tr key={categoria.id_categoria} className="hover:bg-slate-50">
                     <td className="border-b border-slate-100 p-3 text-sm text-slate-700">
                       {categoria.id_categoria}
