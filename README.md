@@ -1,25 +1,48 @@
-# API REST PHP + MySQL - Inventario 
+# API REST PHP + MySQL - Inventario
+
+Sistema de inventario full stack desarrollado con PHP, MySQL, React y Tailwind CSS, implementando operaciones CRUD, control de stock y consumo de API REST.
+
+---
 
 ## Descripción
 
-API REST desarrollada para la gestión de inventario, categorías y productos, implementando operaciones CRUD y control de stock mediante PHP y MySQL.
+Proyecto desarrollado para la gestión de inventario, categorías y productos mediante una arquitectura separada entre backend y frontend.
+
+El sistema permite administrar productos y categorías, actualizar stock, realizar búsquedas dinámicas y visualizar métricas generales mediante un dashboard interactivo.
+
+---
 
 ## Tecnologías utilizadas
 
+### Backend
 - PHP
 - MySQL
 - PDO
+- API REST
+
+### Frontend
+- React
+- Vite
+- Tailwind CSS
+- JavaScript
+
+### Herramientas
+- Git
 - GitHub
 - Postman
+- XAMPP
+
+---
 
 ## Funcionalidades
 
 ### Categorías
 - Listar categorías
 - Crear categorías
-- Obtener categoría por id
+- Obtener categoría por ID
 - Actualizar categorías
 - Eliminar categorías
+- Buscar categorías
 
 ### Productos
 - Listar productos
@@ -28,9 +51,20 @@ API REST desarrollada para la gestión de inventario, categorías y productos, i
 - Actualizar productos
 - Eliminar productos
 - Actualizar stock de productos
+- Buscar productos
+- Indicadores visuales de stock
+
+### Dashboard
+- Total de categorías
+- Total de productos
+- Stock total
+- Productos con bajo stock
+
+---
 
 ## Estructura del proyecto
 
+```text
 api-rest-php-mysql-inventario/
 ├── config/
 │   └── database.php
@@ -43,9 +77,15 @@ api-rest-php-mysql-inventario/
 │   └── api.php
 ├── utils/
 │   └── response.php
+├── frontend/
+│   ├── src/
+│   └── package.json
 ├── index.php
 ├── README.md
 └── .gitignore
+```
+
+---
 
 ## Requisitos
 
@@ -53,82 +93,131 @@ Antes de ejecutar el proyecto se debe tener instalado:
 
 - PHP 8 o superior
 - MySQL
+- Node.js
 - XAMPP
 - Git
-- Postman (opcional para pruebas)
+- Postman (opcional)
+
+---
 
 ## Base de datos
 
 Ejecutar el archivo:
 
+```text
 database/script.sql
+```
 
 El script crea automáticamente:
 
-- Base de datos inventario_jr
-- Tabla categoria
-- Tabla producto
+- Base de datos `inventario_jr`
+- Tabla `categoria`
+- Tabla `producto`
 
-## Ejecutar el proyecto
+---
 
-1. Iniciar Apache y MySQL desde XAMPP.
+## Ejecutar backend
 
-2. Ejecutar el script SQL:
+Iniciar Apache y MySQL desde XAMPP.
 
-3. Levantar el servidor PHP: mysql -u root < "RUTA_COMPLETA\database\script.sql"
+Ejecutar script SQL:
 
-4. Abrir en navegador: http://localhost:8000
+```bash
+mysql -u root < "RUTA_COMPLETA\database\script.sql"
+```
 
-## Endpoints
+Levantar servidor PHP:
 
-## Categorías
-Método	    Endpoint	                    Descripción
-GET	       /categorias	            Lista todas las categorías
-POST	   /categorias	            Crea una categoría
-GET	       /categorias/{id}	        Obtiene una categoría por ID
-PUT	       /categorias/{id}	        Actualiza una categoría
-DELETE	   /categorias/{id}	        Elimina una categoría
+```bash
+php -S localhost:8000 -t .
+```
 
-## Productos
-Método	    Endpoint	                    Descripción
-GET	       /productos	            Lista todos los productos
-POST	   /productos	            Crea un producto
-GET	       /productos/{id}	        Obtiene un producto por ID
-PUT	       /productos/{id}	        Actualiza un producto
-DELETE	   /productos/{id}	        Elimina un producto
-PATCH	   /productos/{id}/stock	Actualiza únicamente el stock de un producto
+Abrir en navegador:
 
-## Frontend
+```text
+http://localhost:8000
+```
 
-El proyecto incluye un frontend desarrollado con React y Tailwind CSS para consumir la API REST.
+---
 
-### Tecnologías del frontend
+## Ejecutar frontend
 
-- React
-- Vite
-- Tailwind CSS
-- JavaScript
+Ingresar a la carpeta frontend:
 
-### Ejecutar frontend
-
-Ingresar a la carpeta 'frontend':
-
+```bash
 cd frontend
+```
 
 Instalar dependencias:
 
+```bash
 npm install
+```
 
-Ejecutar servidor de desarrollo:
+Ejecutar frontend:
 
+```bash
 npm run dev
+```
 
-Abrir en navegador: http://localhost:5173
+Abrir en navegador:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Endpoints
+
+### Categorías
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/categorias` | Listar categorías |
+| POST | `/categorias` | Crear categoría |
+| GET | `/categorias/{id}` | Obtener categoría |
+| PUT | `/categorias/{id}` | Actualizar categoría |
+| DELETE | `/categorias/{id}` | Eliminar categoría |
+
+### Productos
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/productos` | Listar productos |
+| POST | `/productos` | Crear producto |
+| GET | `/productos/{id}` | Obtener producto |
+| PUT | `/productos/{id}` | Actualizar producto |
+| DELETE | `/productos/{id}` | Eliminar producto |
+| PATCH | `/productos/{id}/stock` | Actualizar stock |
+
+---
 
 ## Funcionalidades del frontend
 
-- Listado de categorías
--Creación, edición y eliminación de categorías
-- Listado de productos
-- Creación, edición y eliminación de productos
+- Dashboard con métricas
+- Gestión de categorías
+- Gestión de productos
 - Actualización rápida de stock
+- Búsqueda de categorías y productos
+- Indicadores visuales de stock
+- Diseño responsive
+
+---
+
+## Buenas prácticas implementadas
+
+- Arquitectura organizada por capas
+- Uso de PDO y consultas preparadas
+- Separación entre backend y frontend
+- Componentes reutilizables en React
+- Respuestas JSON estructuradas
+- Validaciones básicas de formularios
+- Manejo de estados y errores
+- Organización modular del frontend
+
+---
+
+## Autor
+
+Jorge García
